@@ -1,0 +1,260 @@
+%% * Learning how to write packages & format documents
+%% * Few things borrowed from https://github.com/vEnhance/dotfiles/blob/main/texmf/tex/latex/evan/evan.sty
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{comptemp}[2024/10/07 Template file for competition maths submissions]
+
+\providecommand{\theauthor}{Goethe}
+\providecommand{\thetitle}{}
+\providecommand{\thedate}{\today}
+
+
+% --- Package Options ---
+% Draw margin line
+\newif\ifcmpmline
+\cmpmlinefalse
+\DeclareOption{mline}{\cmpmlinetrue}
+
+% Use Asymptote
+\newif\ifcmpasy\cmpasytrue
+\cmpasyfalse
+\DeclareOption{asy}{\cmpasytrue}
+
+% No red or green
+\newif\ifcmpnorg\cmpnorgtrue
+\cmpnorgfalse
+\DeclareOption{norg}{\cmpnorgtrue}
+
+\ProcessOptions\relax
+
+% --- Maths & Essential Packages ---
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{thmtools}
+\RequirePackage{mathtools}
+\RequirePackage{textcomp}
+\RequirePackage{gensymb}
+
+% --- Layout Packages ---
+\RequirePackage{geometry}
+
+% --- Language Packages ---
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[english,ngerman]{babel}
+
+% --- Font Packages ---
+\RequirePackage[sc]{mathpazo}
+\RequirePackage[euler-digits,small]{eulervm}
+
+% --- Formatting Packages ---
+\RequirePackage[colorlinks]{hyperref}
+\RequirePackage[draft=false]{scrlayer-scrpage}
+\RequirePackage{microtype}
+
+% --- Drawing Packages ---
+\RequirePackage[framemethod=TikZ]{mdframed}
+\ifcmpasy
+    \RequirePackage{asymptote}
+\fi
+\ifcmpmline
+    \RequirePackage{tikz}
+\fi
+
+% --- Misc Packages ---
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{enumitem}
+\RequirePackage{caption}
+\RequirePackage{etoolbox}
+
+% --- Package Setup ---
+\ifcmpmline
+    \geometry{a4paper,left=5cm+1cm,right=1cm,top=1in,bottom=1in}
+\else
+    \geometry{a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\fi
+
+\ifcmpnorg
+    \hypersetup{
+        linkcolor = {Magenta},
+    }
+\fi
+
+\setkomafont{title}{\normalfont}
+\KOMAoptions{fontsize=10pt,headsepline,parskip}
+
+\microtypesetup{
+    activate={true,nocompatibility},
+    kerning=true,
+    tracking=true,
+    spacing=true,
+    factor=1100,
+    stretch=10,
+    shrink=10,
+}
+
+\BeforeBeginEnvironment{proof}{\vspace{-1em}}
+
+% --- Header and Footer ---
+\ifcmpmline
+    \ihead{\thetitle}
+    \ohead{\theauthor}
+    \cfoot*{}
+    \ofoot*{\thepage}
+\else
+    \ihead{\thetitle}
+    \ohead{\theauthor}
+\fi
+
+% --- Margin line ---
+\ifcmpmline
+    \AddToHook{shipout/background}{
+        \begin{tikzpicture}[remember picture,overlay]
+            \draw[line width = 1pt]
+            ([xshift=5cm] current page.north west) --
+            ([xshift=5cm] current page.south west);
+        \end{tikzpicture}
+    }
+\fi
+
+% --- Macros ---
+\newcommand{\cbrt}[1]{\sqrt[3]{#1}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceiling}[1]{\left\lceil #1 \right\rceil}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+
+\newcommand{\dg}{^\circ}
+\newcommand{\ol}{\overline}
+\newcommand{\ul}{\underline}
+\providecommand{\half}{\frac{1}{2}}
+\newcommand{\rcp}[1]{\frac{1}{#1}}
+\newcommand{\nequiv}{\not\equiv}
+
+\DeclareMathOperator{\kgV}{kgV}
+\DeclareMathOperator{\ggT}{ggT}
+\DeclareMathOperator{\ord}{ord}
+
+% Absolute value
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+\makeatother
+
+\mathtoolsset{centercolon}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% --- Thmbox Styles ---
+% Problem box
+\mdfdefinestyle{problembox}{
+    linewidth=1pt,
+    skipabove=2em,
+    skipbelow=1em,
+    innerbottommargin=8pt,
+    innertopmargin=8pt,
+    innerleftmargin=8pt,
+    innerrightmargin=8pt,
+    nobreak=true,
+    linecolor=BurntOrange,
+    backgroundcolor=BurntOrange!20,
+}
+
+\declaretheoremstyle[
+    spaceabove=0pt,
+    headfont=\bfseries,
+    mdframed={style=problembox},
+    headpunct={\\[3pt]},postheadspace={0pt},
+]{styproblembox}
+
+% Claim box
+\ifcmpnorg
+    \mdfdefinestyle{claimbox}{
+        linewidth=2pt,
+        skipabove=1em,
+        leftline=false,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        nobreak=true,
+        backgroundcolor=Plum!10,
+    }
+\else
+    \mdfdefinestyle{claimbox}{
+        linewidth=2pt,
+        skipabove=1em,
+        leftline=false,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        nobreak=true,
+        backgroundcolor=RoyalBlue!10,
+    }
+\fi
+
+\declaretheoremstyle[
+    spaceabove=0pt,
+    headfont=\bfseries,
+    mdframed={style=claimbox},
+    headpunct={ --- },
+]{styclaimbox}
+
+% Theorem box
+\ifcmpnorg
+    \mdfdefinestyle{theorembox}{
+        linewidth=3pt,
+        skipabove=1em,
+        leftline=true,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        nobreak=true,
+        linecolor=MidnightBlue,
+        backgroundcolor=TealBlue!10,
+    }
+\else
+    \mdfdefinestyle{theorembox}{
+        linewidth=3pt,
+        skipabove=1em,
+        leftline=true,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        nobreak=true,
+        linecolor=ForestGreen,
+        backgroundcolor=ForestGreen!10,
+    }
+\fi
+
+\declaretheoremstyle[
+    spaceabove=0pt,
+    headfont=\bfseries,
+    mdframed={style=theorembox},
+]{stytheorembox}
+
+
+% --- Asymptote Setup ---
+\ifcmpasy
+    \begin{asydef}
+        defaultpen(fontsize(10pt));
+        size(6cm);
+        usepackage("amsmath");
+        usepackage("amssymb");
+        settings.tex="pdflatex";
+        settings.outformat="pdf";
+        import geometry;
+    \end{asydef}
+\fi
+
+% --- Page Setup ---
+\title{\thetitle}
+\author{\theauthor}
+\date{\thedate}
+
+\endinput
