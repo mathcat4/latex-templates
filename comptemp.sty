@@ -12,9 +12,15 @@
 
 % --- Package Options ---
 % Draw margin line
-\newif\ifcmpmline
+\newif\ifcmpmline\cmpmlinetrue
 \cmpmlinefalse
 \DeclareOption{mline}{\cmpmlinetrue}
+
+% Draw margin line on right
+\newif\ifcmpmlineswitch\cmpmlineswitchtrue
+\cmpmlineswitchfalse
+\DeclareOption{mlineswitch}{\cmpmlineswitchtrue}
+
 
 % Use Asymptote
 \newif\ifcmpasy\cmpasytrue
@@ -72,7 +78,11 @@
 
 % --- Package Setup ---
 \ifcmpmline
-    \geometry{a4paper,left=5cm+1cm,right=1cm,top=1in,bottom=1in}
+    \ifcmpmlineswitch
+        \geometry{a4paper,left=1cm,right=5cm+1cm,top=1in,bottom=1in}
+    \else
+        \geometry{a4paper,left=5cm+1cm,right=1cm,top=1in,bottom=1in}
+    \fi
 \else
     \geometry{a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
 \fi
@@ -111,13 +121,23 @@
 
 % --- Margin line ---
 \ifcmpmline
-    \AddToHook{shipout/background}{
-        \begin{tikzpicture}[remember picture,overlay]
-            \draw[line width = 1pt]
-            ([xshift=5cm] current page.north west) --
-            ([xshift=5cm] current page.south west);
-        \end{tikzpicture}
-    }
+    \ifcmpmlineswitch
+        \AddToHook{shipout/background}{
+            \begin{tikzpicture}[remember picture,overlay]
+                \draw[line width = 1pt]
+                ([xshift=-5cm] current page.north east) --
+                ([xshift=-5cm] current page.south east);
+            \end{tikzpicture}
+        }
+    \else
+        \AddToHook{shipout/background}{
+            \begin{tikzpicture}[remember picture,overlay]
+                \draw[line width = 1pt]
+                ([xshift=5cm] current page.north west) --
+                ([xshift=5cm] current page.south west);
+            \end{tikzpicture}
+        }
+    \fi
 \fi
 
 % --- Macros ---
