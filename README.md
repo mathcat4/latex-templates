@@ -42,3 +42,9 @@ Add the following to the preamble (before `\begin{document}`) to use theoremboxe
 \AfterEndEnvironment{claim}{\vspace{-1em}}
 \AfterEndEnvironment{problem}{\vspace{-1em}}
 ```
+and use it like you'd use a normal environment.
+```
+\begin{lemma}\label{lem:1.1}
+  % ...
+\end{lemma}
+```
